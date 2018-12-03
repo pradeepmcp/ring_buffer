@@ -29,6 +29,7 @@ class ring_buffer:
         
         if (self.__watch_for_overflow == True and self.__free > self.__read):
             self.overflow = True;
+            raise OverflowError("Buffer overflow")
     
         if self.underflow == True:
             self.underflow = False
