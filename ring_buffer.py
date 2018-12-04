@@ -10,7 +10,7 @@ class ring_buffer:
     def __init__(self, size):
         self.__free=0
         self.__read=0
-        self.data=[]
+        self.data=[None] * size
         self.size=size
         self.overflow=False
         self.underflow=True
@@ -20,9 +20,13 @@ class ring_buffer:
         
     ## Appends element at the end of the buffer
     # @elem element to be appended to the buffer.
-    def append(self, elem, count=0):
-        self.data.append(elem)
-        self.__free = (self.__free + 1) % self.size
+    def append(self, elem, count):
+        data_end = min(self.__free + count, self.size)
+        elem_end = min(data_end, self.size)
+
+        self.data[self.__free : data_end] = elem[0 : elem_end]
+        self.__free = (self.__free+count) % self.size
+        self.data[0 : self.__free] = elem[elem_end : elem_end+self.__free ]
                 
         if self.__free <= self.__read:
             self.__watch_for_overflow = True
