@@ -21,16 +21,16 @@ class ring_buffer:
     ## Appends element at the end of the buffer
     # @elem element to be appended to the buffer.
     def append(self, elem, count):
+        if self.__free+count > self.size:
+            self.__watch_for_overflow = True
+        
         data_end = min(self.__free + count, self.size)
         elem_end = min(data_end, self.size)
 
         self.data[self.__free : data_end] = elem[0 : elem_end]
         self.__free = (self.__free+count) % self.size
         self.data[0 : self.__free] = elem[elem_end : elem_end+self.__free ]
-                
-        if self.__free <= self.__read:
-            self.__watch_for_overflow = True
-        
+
         if (self.__watch_for_overflow == True and self.__free > self.__read):
             self.overflow = True;
             raise OverflowError("Buffer overflow")
